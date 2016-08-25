@@ -17,7 +17,11 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-	res.render('home', { fortune: fortune.getFortune() });
+	res.render('home');
+});
+
+app.get('/about', function(req, res) {
+	res.render('about', { fortune: fortune.getFortune() });
 });
 
 app.use(function(req, res, next) {
