@@ -1,5 +1,6 @@
 var express = require('express');
 var fortune = require('./lib/fortune.js');
+var weather = require('./lib/weather.js');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -23,6 +24,13 @@ app.use(function(req, res, next) {
 	res.locals.showTests = app.get('env') !== 'production' &&
 		req.query.test === '1';
 	next();
+});
+
+// middleware to add weather data to context
+app.use(function(req, res, next) {
+	if(!res.locals.partials) res.locals.partials = {};
+ 	res.locals.partials.weatherContext = weather.getWeatherData();
+ 	next();
 });
 
 app.get('/', function(req, res) {
