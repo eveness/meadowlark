@@ -1,0 +1,16 @@
+<h1>Фотоконкурс Meadowlark Travel vacation</h1>
+<form action="/contest/vacation-photo/{{year}}/{{month}}" method="POST" enctype="multipart/form-data">
+	<div>
+		<label for="fieldName">Имя</label>
+		<input type="text" name="name" id="fieldName">
+	</div>
+	<div>
+		<label for="fieldEmail">Электронный адрес</label>
+		<input type="text" name="email" id="fieldEmail" required>
+	</div>
+	<div>
+		<label for="fieldPhoto">Фотография из отпуска</label>
+		<input type="file" name="photo" id="fieldPhoto" accept="image/*" required>
+	</div>
+	<button type="submit">Отправить</button>
+</form>
