@@ -1,13 +1,41 @@
 <h2>Подпишитесь на нашу рассылку для получения новостей и специальных предложений!</h2>
-<form action="/process?form=newsletter" method="POST">
-	<input type="hidden" name="_csrf" value="{{csrf}}">
-	<div>
-		<label for="fieldName">Имя</label>
-		<input type="text" name="name" id="fieldName">
-	</div>
-	<div>
-		<label for="fieldEmail">Электронный адрес</label>
-		<input type="text" name="email" id="fieldEmail" required>
-	</div>
-	<button type="submit">Зарегистрироваться</button>
-</form>
+<div class="formContainer">
+	<form action="/process?form=newsletter" method="POST" class="newsLetterForm">
+		<input type="hidden" name="_csrf" value="{{csrf}}">
+		<div>
+			<label for="fieldName">Имя</label>
+			<input type="text" name="name" id="fieldName">
+		</div>
+		<div>
+			<label for="fieldEmail">Электронный адрес</label>
+			<input type="text" name="email" id="fieldEmail" required>
+		</div>
+		<button type="submit">Зарегистрироваться</button>
+	</form>
+</div>
+{{#section 'jquery'}}
+<script>
+	$(document).ready(function() {
+		$('.newsLetterForm').on('submit', function(e) {
+			e.preventDefault();
+			var action = $(this).attr('action');
+			var $container = $(this).closest('.formContainer');
+			$.ajax({
+				url: action,
+				type: 'POST',
+				data: $(this).serialize(),
+				success: function(data) {
+					if(data.success) {
+						$container.html('<h2>Спасибо!</h2>');
+					} else {
+						$container.html('Возникла проблема.');
+					}
+				},
+				error: function() {
+					$container.html('Возникла проблема.');
+				}
+			});
+		});
+	});
+</script>
+{{/section}}
