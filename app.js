@@ -1,5 +1,6 @@
 var express = require('express');
 var formidable = require('formidable');
+var jqupload = require('jquery-file-upload-middleware');
 var fortune = require('./lib/fortune.js');
 var weather = require('./lib/weather.js');
 
@@ -35,6 +36,18 @@ app.use(function(req, res, next) {
 	if(!res.locals.partials) res.locals.partials = {};
  	res.locals.partials.weatherContext = weather.getWeatherData();
  	next();
+});
+
+app.use('/upload', function(req, res, next) {
+	var now = new Date();
+	jqupload.fileHandler({
+		uploadDir: function() {
+			return __dirname + '/public/uploads/' + now;
+		},
+		uploadUrl: function() {
+			return '/uploads/' + now;
+		}
+	})(req, res, next);
 });
 
 app.get('/', function(req, res) {
@@ -87,6 +100,13 @@ app.get('/thank-you', function(req, res) {
 	res.render('thank-you');
 });
 
+app.get('/contest/vacation-photo-jquery', function(req, res) {
+	var now = new Date();
+	res.render('contest/vacation-photo-jquery', {
+		year: now.getFullYear(),
+		month: now.getMonth()
+	});
+});
 app.get('/contest/vacation-photo', function(req, res) {
 	var now = new Date();
 	res.render('contest/vacation-photo', {

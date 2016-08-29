@@ -1,0 +1,42 @@
+<h1>Фотоконкурс Meadowlark Travel vacation</h1>
+<form action="/contest/vacation-photo/{{year}}/{{month}}" method="POST" enctype="multipart/form-data">
+	<div>
+		<label for="fieldName">Имя</label>
+		<input type="text" name="name" id="fieldName">
+	</div>
+	<div>
+		<label for="fieldEmail">Электронный адрес</label>
+		<input type="text" name="email" id="fieldEmail" required>
+	</div>
+	<div>
+		<label for="fieldPhoto">Фотография из отпуска</label>
+		<span class="btn-file">
+			Загрузить
+			<input type="file" name="photo" id="fieldPhoto" accept="image/*" required data-url="/upload" multiple name="photo">
+		</span>
+		<div id="fileUploads"></div>
+	</div>
+	<button type="submit">Отправить</button>
+</form>
+
+{{#section 'jquery'}}
+	<script src="/vendor/js/vendor/jquery.ui.widget.js"></script>
+	<script src="/vendor/js/jquery.iframe-transport.js"></script>
+	<script src="/vendor/js/jquery.fileupload.js"></script>
+	<script>
+		$(document).ready(function(){
+
+			$('#fieldPhoto').fileupload({
+				dataType: 'json',
+				done: function(e, data){
+					$.each(data.result.files, function(index, file){
+						$('#fileUploads').append($('<div class="upload">' +
+							'<span class="glyphicon glyphicon-ok"></span>&nbsp;' +
+							file.originalName + '</div>'));
+					});
+				}
+			});
+
+		});
+	</script>
+{{/section}}
