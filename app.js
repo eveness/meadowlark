@@ -3,6 +3,7 @@ var formidable = require('formidable');
 var jqupload = require('jquery-file-upload-middleware');
 var fortune = require('./lib/fortune.js');
 var weather = require('./lib/weather.js');
+var credentials = require('./credentials.js');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -28,6 +29,9 @@ app.use(function(req, res, next) {
 	next();
 });
 
+// middleware cookie parser
+app.use(require('cookie-parser')(credentials.cookieSecret));
+
 // middleware parse url encoded body
 app.use(require('body-parser').urlencoded({ extended: true }));
 
@@ -51,6 +55,7 @@ app.use('/upload', function(req, res, next) {
 });
 
 app.get('/', function(req, res) {
+	res.cookie('test', 'work!', { signed: true });
 	res.render('home');
 });
 
