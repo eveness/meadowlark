@@ -1,0 +1,15 @@
+<h1>Подпишитесь на нашу рассылку для получения новостей и специальных предложений!</h1>
+<div class="formContainer">
+	<form action="/test-form" method="POST" class="newsLetterForm">
+		<input type="hidden" name="_csrf" value="{{csrf}}">
+		<div>
+			<label for="fieldName">Имя</label>
+			<input type="text" name="name" id="fieldName">
+		</div>
+		<div>
+			<label for="fieldEmail">Электронный адрес</label>
+			<input type="text" name="email" id="fieldEmail" required>
+		</div>
+		<button type="submit">Зарегистрироваться</button>
+	</form>
+</div>
