@@ -48,6 +48,18 @@ app.use(function(req, res, next) {
 	next();
 });
 
+// loggers
+switch(app.get('env')) {
+	case 'development':
+		app.use(require('morgan')('dev'));
+		break;
+	case 'production':
+		app.use(require('express-logger')({
+			path: __dirname + '/log/requests.log'
+		}));
+		break;
+}
+
 // middleware cookie parser and session
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({
@@ -202,5 +214,6 @@ app.use(function(err, req, res, next) {
 });
 
 app.listen(app.get('port'), function() {
-	console.log('Express запущен на http://localhost:' + app.get('port'));
+	console.log('Express запущен в режиме ' + app.get('env') +
+		' на http://localhost:' + app.get('port'));
 });
