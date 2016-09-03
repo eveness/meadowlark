@@ -21,24 +21,24 @@ var handlebars = require('express-handlebars').create({
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
-var nodemailer = require('nodemailer');
-var mailTransport = nodemailer.createTransport({
-	host: 'smtp.gmail.com',
-    port: 465,
-	auth: {
-		user: credentials.gmail.user,
-		pass: credentials.gmail.password
-	}
-});
-mailTransport.sendMail({
-	from: '"Meadowlark Travel" <info@meadowlarktravel.com>',
-	to: 'joecustomer@gmail.com',
-	subject: 'Ваш тур Meadowlark Travel',
-	text: 'Спасибо за заказ поездки в Meadowlark Travel.' +
-		' Мы ждем вас с нетерепнием!'
-}, function(err) {
-	if(err) console.error('Невозможно отправить письмо: ' + err);
-});
+// var nodemailer = require('nodemailer');
+// var mailTransport = nodemailer.createTransport({
+// 	host: 'smtp.gmail.com',
+//     port: 465,
+// 	auth: {
+// 		user: credentials.gmail.user,
+// 		pass: credentials.gmail.password
+// 	}
+// });
+// mailTransport.sendMail({
+// 	from: '"Meadowlark Travel" <info@meadowlarktravel.com>',
+// 	to: 'joecustomer@gmail.com',
+// 	subject: 'Ваш тур Meadowlark Travel',
+// 	text: 'Спасибо за заказ поездки в Meadowlark Travel.' +
+// 		' Мы ждем вас с нетерепнием!'
+// }, function(err) {
+// 	if(err) console.error('Невозможно отправить письмо: ' + err);
+// });
 
 app.use(express.static(__dirname + '/public'));
 
