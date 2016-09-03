@@ -21,6 +21,52 @@ var handlebars = require('express-handlebars').create({
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
+// использование доменов для обработки ошибок
+app.use(function(req, res, next){
+    // создаем домен для этого запроса
+    var domain = require('domain').create();
+    // обрабатываем ошибки на этом домене
+    domain.on('error', function(err){
+        console.error('ПЕРЕХВАЧЕНА ОШИБКА ДОМЕНА\n', err.stack);
+        try {
+            // отказобезопасное отключение через 5 секунд
+            setTimeout(function(){
+                console.error('Отказобезопасное отключение.');
+                process.exit(1);
+            }, 5000);
+
+            // отключение от кластера
+            var worker = require('cluster').worker;
+            if(worker) worker.disconnect();
+
+            // прекращение принятия новых запросов
+            server.close();
+
+            try {
+                // попытка использовать маршрутизацию ошибок Express
+                next(err);
+            } catch(error){
+                // если маршрутизация ошибок Express не сработала,
+                // пробуем выдать текстовый ответ Node
+                console.error('Сбой механизма обработки ошибок Express.\n',
+                	error.stack);
+                res.statusCode = 500;
+                res.setHeader('content-type', 'text/plain');
+                res.end('Ошибка сервера.');
+            }
+        } catch(error){
+            console.error('Не могу отправить ответ 500.\n', error.stack);
+        }
+    });
+
+    // добавляем объекты запроса и ответа в домен
+    domain.add(req);
+    domain.add(res);
+
+    // выполняем оставшуюся часть цепочки запроса в домене
+    domain.run(next);
+});
+
 // var nodemailer = require('nodemailer');
 // var mailTransport = nodemailer.createTransport({
 // 	host: 'smtp.gmail.com',
@@ -211,15 +257,23 @@ app.get('/headers', function(req, res) {
 	res.send(s);
 });
 
+app.get('/fail', function(req, res) {
+	throw new Error('Нет!');
+});
+
+app.get('/epic-fail', function(req, res) {
+	process.nextTick(function() {
+		throw new Error('Бабах!');
+	});
+});
+
 app.use(function(req, res, next) {
-	res.status(404);
-	res.render('404');
+	res.status(404).render('404');
 });
 
 app.use(function(err, req, res, next) {
-	console.log(err.stack);
-	res.status(500);
-	res.render('500');
+	console.error(err.stack);
+	res.status(500).render('500');
 });
 
 function startServer() {
