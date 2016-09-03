@@ -10,11 +10,13 @@
     "express-session": "^1.14.1",
     "formidable": "^1.0.17",
     "jquery-file-upload-middleware": "^0.1.7",
+    "loadtest": "^1.4.4",
     "morgan": "^1.7.0",
     "nodemailer": "^2.5.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "commander": "^2.9.0",
     "grunt": "^0.4.5",
     "grunt-cafe-mocha": "^0.1.13",
     "grunt-contrib-jshint": "^1.0.0",
