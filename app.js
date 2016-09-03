@@ -97,6 +97,15 @@ app.use(function(req, res, next) {
 	next();
 });
 
+// обработка разными исполнителями (кластеризация)
+app.use(function(req, res, next) {
+	var cluster = require('cluster');
+	if(cluster.isWorker) {
+		console.log('Исполнитель %d получил запрос', cluster.worker.id);
+	}
+	next();
+});
+
 app.get('/', function(req, res) {
 	res.render('home');
 });
@@ -213,7 +222,20 @@ app.use(function(err, req, res, next) {
 	res.render('500');
 });
 
-app.listen(app.get('port'), function() {
-	console.log('Express запущен в режиме ' + app.get('env') +
-		' на http://localhost:' + app.get('port'));
-});
+function startServer() {
+	app.listen(app.get('port'), function() {
+		console.log('Express запущен в режиме ' + app.get('env') +
+			' на http://localhost:' + app.get('port'));
+	});
+}
+
+if(require.main === module) {
+	// приложение запускается непосредственно:
+	// запускаем сервер приложения
+	startServer();
+} else {
+	// приложение импортируется как модуль
+	// посредством "require":
+	// экспортируем функцию для создания сервера
+	module.exports = startServer;
+}
