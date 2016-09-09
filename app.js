@@ -4,6 +4,7 @@ var jqupload = require('jquery-file-upload-middleware');
 var fortune = require('./lib/fortune.js');
 var weather = require('./lib/weather.js');
 var credentials = require('./credentials.js');
+var fs = require('fs');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -236,15 +237,47 @@ app.get('/contest/vacation-photo', function(req, res) {
 		month: now.getMonth()
 	});
 });
+
+var dataDir = __dirname + '/data';
+var vacationPhotoDir = dataDir + '/vacation-photo';
+
+try {
+	fs.statSync(dataDir);
+} catch (e) {
+	fs.mkdirSync(dataDir);
+}
+try {
+	fs.statSync(vacationPhotoDir);
+} catch (e) {
+	fs.mkdirSync(vacationPhotoDir);
+}
+
+function saveContestEntry(contestName, email, year, month, photoPath) {
+	// TODO
+}
 app.post('/contest/vacation-photo/:year/:month', function(req, res) {
 	var form = new formidable.IncomingForm();
 	form.parse(req, function(err, fields, files) {
-		if(err) return res.redirect(303, '/error');
-		console.log('recieved fields:');
-		console.log(fields);
-		console.log('recieved files:');
-		console.log(files);
-		res.redirect(303, '/thank-you');
+		if(err) {
+			req.session.flash = {
+				type: 'danger',
+				intro: 'Упс!',
+				message: 'Во время обработки отправленной Вами формы произошла ошибка. Пожалуйста, попробуйте ещё раз.'
+			};
+			return res.redirect(303, '/error');
+		}
+		var photo = files.photo;
+		var dir = vacationPhotoDir + '/' + Date.now();
+		var path = dir + '/' + photo.name;
+		fs.mkdirSync(dir);
+		fs.renameSync(photo.path, dir + '/' + photo.name);
+		saveContestEntry('vacation-photo', fields.email, req.params.year, req.params.month, path);
+		req.session.flash = {
+			type: 'success',
+			intro: 'Удачи!',
+			message: 'Вы стали участником конкурса.'
+		};
+		return res.redirect(303, '/contest/vacation-photo/entries');
 	});
 });
 
