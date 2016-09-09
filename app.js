@@ -120,11 +120,15 @@ switch(app.get('env')) {
 }
 
 // middleware cookie parser and session
+var MongoSessionStore = require('session-mongoose')(require('connect'));
+var sessionStore = new MongoSessionStore({ url: credentials.mongo[app.get('env')].connectionString });
+
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({
 	resave: false,
 	saveUninitialized: false,
-	secret: credentials.cookieSecret
+	secret: credentials.cookieSecret,
+	store: sessionStore
 }));
 
 // middleware parse url encoded body
@@ -293,25 +297,6 @@ app.post('/contest/vacation-photo/:year/:month', function(req, res) {
 	});
 });
 
-app.get('/headers', function(req, res) {
-	res.set('Content-Type', 'text/plain');
-	var s = '';
-	for (var name in req.headers) {
-		s += name + ': ' + req.headers[name] + '\n';
-	}
-	res.send(s);
-});
-
-app.get('/fail', function(req, res) {
-	throw new Error('Нет!');
-});
-
-app.get('/epic-fail', function(req, res) {
-	process.nextTick(function() {
-		throw new Error('Бабах!');
-	});
-});
-
 app.get('/vacations', function(req, res){
     Vacation.find({ available: true }, function(err, vacations){
     	var currency = req.session.currency || 'USD';
@@ -323,14 +308,32 @@ app.get('/vacations', function(req, res){
                     name: vacation.name,
                     description: vacation.description,
                     inSeason: vacation.inSeason,
-                    price: vacation.getDisplayPrice(),
+                    //price: vacation.getDisplayPrice(),
+                    price: convertFromUSD(vacation.priceInCents/100, currency),
                     qty: vacation.qty,
                 };
             })
         };
+        switch(currency){
+	    	case 'USD': context.currencyUSD = 'selected'; break;
+	        case 'GBP': context.currencyGBP = 'selected'; break;
+	        case 'BTC': context.currencyBTC = 'selected'; break;
+	    }
         res.render('vacations', context);
     });
 });
+app.get('/set-currency/:currency', function(req,res){
+    req.session.currency = req.params.currency;
+    return res.redirect(303, '/vacations');
+});
+function convertFromUSD(value, currency){
+    switch(currency){
+    	case 'USD': return '$' + (value * 1);
+        case 'GBP': return '£' + (value * 0.6);
+        case 'BTC': return (value * 0.0023707918444761) + ' Bitcoins';
+        default: return NaN;
+    }
+}
 
 app.get('/notify-me-when-in-season', function(req, res){
     res.render('notify-me-when-in-season', { sku: req.query.sku });
@@ -358,6 +361,25 @@ app.post('/notify-me-when-in-season', function(req, res){
 	        return res.redirect(303, '/vacations');
 	    }
 	);
+});
+
+app.get('/headers', function(req, res) {
+	res.set('Content-Type', 'text/plain');
+	var s = '';
+	for (var name in req.headers) {
+		s += name + ': ' + req.headers[name] + '\n';
+	}
+	res.send(s);
+});
+
+app.get('/fail', function(req, res) {
+	throw new Error('Нет!');
+});
+
+app.get('/epic-fail', function(req, res) {
+	process.nextTick(function() {
+		throw new Error('Бабах!');
+	});
 });
 
 app.use(function(req, res, next) {
