@@ -5,6 +5,13 @@ var fortune = require('./lib/fortune.js');
 var weather = require('./lib/weather.js');
 var credentials = require('./credentials.js');
 var fs = require('fs');
+var mongoose = require('mongoose');
+var opts = {
+	server: {
+		socketOption: { keepAlive: 1 }
+	}
+};
+var Vacation = require('./models/vacation.js');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -99,12 +106,16 @@ app.use(function(req, res, next) {
 switch(app.get('env')) {
 	case 'development':
 		app.use(require('morgan')('dev'));
+		mongoose.connect(credentials.mongo.development.connectionString, opts);
 		break;
 	case 'production':
 		app.use(require('express-logger')({
 			path: __dirname + '/log/requests.log'
 		}));
+		mongoose.connect(credentials.mongo.production.connectionString, opts);
 		break;
+	default:
+		throw new Error('Неизвестная среда выполнения: ' + app.get('env'));
 }
 
 // middleware cookie parser and session
@@ -298,6 +309,26 @@ app.get('/epic-fail', function(req, res) {
 	process.nextTick(function() {
 		throw new Error('Бабах!');
 	});
+});
+
+app.get('/vacations', function(req, res){
+    Vacation.find({ available: true }, function(err, vacations){
+    	var currency = req.session.currency || 'USD';
+        var context = {
+            currency: currency,
+            vacations: vacations.map(function(vacation){
+                return {
+                    sku: vacation.sku,
+                    name: vacation.name,
+                    description: vacation.description,
+                    inSeason: vacation.inSeason,
+                    price: vacation.getDisplayPrice(),
+                    qty: vacation.qty,
+                };
+            })
+        };
+        res.render('vacations', context);
+    });
 });
 
 app.use(function(req, res, next) {
