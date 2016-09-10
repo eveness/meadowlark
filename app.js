@@ -173,6 +173,26 @@ app.use(function(req, res, next) {
 
 require('./routes.js')(app);
 
+// автоматическая визуализация представлений
+var autoViews = {};
+var fs = require('fs');
+
+app.use(function(req, res, next) {
+	var path = req.path.toLowerCase();
+	// проверка кэша, если он там есть, визиализируем представление
+	if(autoViews[path]) return res.render(autoViews[path]);
+	// если его нет в кэше, проверяем наличие
+	// подходящего файла .handlebars
+	try {
+		fs.statSync(__dirname + '/views' + path + '.handlebars');
+		autoViews[path] = path.replace(/^\//, '');
+		return res.render(autoViews[path]);
+	} catch (e) {
+		// представление не найдено, переходим к обработчику кода 404
+		next();
+	}
+});
+
 app.use(function(req, res, next) {
 	res.status(404).render('404');
 });
