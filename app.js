@@ -13,6 +13,7 @@ var opts = {
 };
 var Vacation = require('./models/vacation.js');
 var VacationInSeasonListener = require('./models/vacationInSeasonListener.js');
+var vhost = require('vhost');
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -29,6 +30,13 @@ var handlebars = require('express-handlebars').create({
 });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
+
+var admin = express.Router();
+app.use(vhost('admin.*', admin));
+admin.get('/', function(req, res) {
+	res.set('Content-Type', 'text/plain');
+	res.send('Adiministration');
+});
 
 // использование доменов для обработки ошибок
 app.use(function(req, res, next){
