@@ -7,8 +7,7 @@
             <span class="price">{{price}}</span> 
             <a href="/cart/add?sku={{sku}}" class="btn btn-default">Купить сейчас!</a>
         {{else}}
-            <span class="outOfSeason">К сожалению в настоящий момент не сезон для этого тура.
-            {{! TODO Страница "сообщите мне, когда наступит сезон для этого тура". }}
+            <span class="outOfSeason">К сожалению в настоящий момент не сезон для этого тура. 
             <a href="/notify-me-when-in-season?sku={{sku}}">Сообщите мне, когда наступит сезон для этого тура.</a>
         {{/if}}
     </div>
