@@ -1,8 +1,9 @@
 var fs = require('fs');
+var path = require('path');
 var formidable = require('formidable');
 
-var dataDir = __dirname + '/data';
-var vacationPhotoDir = dataDir + '/vacation-photo';
+var dataDir = path.normalize(path.join(__dirname, '..', 'data'));
+var vacationPhotoDir = path.join(dataDir, 'vacation-photo');
 
 try {
 	fs.statSync(dataDir);
