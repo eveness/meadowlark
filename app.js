@@ -390,6 +390,20 @@ app.get('/epic-fail', function(req, res) {
 	});
 });
 
+app.get('/foo',
+	function(req, res, next) {
+		if(Math.random() < 0.33) return next();
+		res.send('красный');
+	},
+	function(req, res, next) {
+		if(Math.random() < 0.5) return next();
+		res.send('зеленый');
+	},
+	function(req, res) {
+		res.send('синий');
+	}
+);
+
 app.use(function(req, res, next) {
 	res.status(404).render('404');
 });
