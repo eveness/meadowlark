@@ -32,9 +32,6 @@ admin.get('/', function(req, res) {
 	res.send('Adiministration');
 });
 
-// api
-app.use('/api', require('cors')());
-
 // использование доменов для обработки ошибок
 app.use(function(req, res, next){
     // создаем домен для этого запроса
@@ -176,23 +173,42 @@ app.use(function(req, res, next) {
 
 require('./routes.js')(app);
 
-// api
-var Attraction = require('./models/attraction.js');
-app.get('/api/attractions', function(req, res, next) {
-	Attraction.find({ approved: true }, function(err, attractions) {
-		if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
-		res.json(attractions.map(function(a) {
-			return {
-				name: a.name,
-				id: a._id,
-				description: a.description,
-				location: a.location
-			};
-		}));
-	});
+// API
+var apiOptions = {
+    context: '/api',
+    domain: require('domain').create()
+};
+var rest = require('connect-rest').create(apiOptions);
+app.use(rest.processRequest());
+
+apiOptions.domain.on('error', function(err) {
+    console.log('API domain error.\n', err.stack);
+    setTimeout(function(){
+        console.log('Останов сервера после ошибки домена API.');
+        process.exit(1);
+    }, 5000);
+    server.close();
+    var worker = require('cluster').worker;
+    if(worker) worker.disconnect();
 });
-app.post('/api/attraction', function(req, res, next) {
-	var a = new Attraction({
+
+var Attraction = require('./models/attraction.js');
+
+rest.get('/attractions', function(req, content, cb) {
+    Attraction.find({ approved: true }, function(err, attractions){
+        if(err) return cb({ error: 'Внутренняя ошибка.' });
+        cb(null, attractions.map(function(a){
+            return {
+                name: a.name,
+                description: a.description,
+                location: a.location,
+            };
+        }));
+    });
+});
+
+rest.post('/attraction', function(req, content, cb) {
+    var a = new Attraction({
         name: req.body.name,
         description: req.body.description,
         location: { lat: req.body.lat, lng: req.body.lng },
@@ -204,16 +220,16 @@ app.post('/api/attraction', function(req, res, next) {
         approved: false,
     });
     a.save(function(err, a){
-        if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
-        res.json({ id: a._id });
+        if(err) return cb({ error: 'Невозможно добавить достопримечательность.' });
+        cb(null, { id: a._id });
     });
 });
-app.get('/api/attraction/:id', function(req, res) {
-	Attraction.findById(req.params.id, function(err, a){
-        if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
-        res.json({
+
+rest.get('/attraction/:id', function(req, content, cb) {
+    Attraction.findById(req.params.id, function(err, a) {
+        if(err) return cb({ error: 'Невозможно извлечь достопримечательность.' });
+        cb(null, {
             name: a.name,
-            id: a._id,
             description: a.description,
             location: a.location,
         });
