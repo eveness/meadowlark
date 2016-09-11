@@ -13,7 +13,7 @@ module.exports = function(grunt){
 			all: { src: 'qa/tests-*.js', options: { ui: 'tdd' }, }
 		},
 		jshint: {
-			app: ['app.js', 'app_cluster.js', 'public/js/**/*.js', 'lib/**/*.js'],
+			app: ['app.js', 'app_cluster.js', 'public/js/**/*.js', 'lib/**/*.js', 'models/**/*.js', 'handlers/**/*.js'],
 			qa: ['Gruntfile.js', 'public/qa/**/*.js', 'qa/**/*.js'],
 		},
 		exec: {
