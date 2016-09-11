@@ -32,6 +32,9 @@ admin.get('/', function(req, res) {
 	res.send('Adiministration');
 });
 
+// api
+app.use('/api', require('cors')());
+
 // использование доменов для обработки ошибок
 app.use(function(req, res, next){
     // создаем домен для этого запроса
@@ -172,6 +175,50 @@ app.use(function(req, res, next) {
 });
 
 require('./routes.js')(app);
+
+// api
+var Attraction = require('./models/attraction.js');
+app.get('/api/attractions', function(req, res, next) {
+	Attraction.find({ approved: true }, function(err, attractions) {
+		if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
+		res.json(attractions.map(function(a) {
+			return {
+				name: a.name,
+				id: a._id,
+				description: a.description,
+				location: a.location
+			};
+		}));
+	});
+});
+app.post('/api/attraction', function(req, res, next) {
+	var a = new Attraction({
+        name: req.body.name,
+        description: req.body.description,
+        location: { lat: req.body.lat, lng: req.body.lng },
+        history: {
+            event: 'created',
+            email: req.body.email,
+            date: new Date(),
+        },
+        approved: false,
+    });
+    a.save(function(err, a){
+        if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
+        res.json({ id: a._id });
+    });
+});
+app.get('/api/attraction/:id', function(req, res) {
+	Attraction.findById(req.params.id, function(err, a){
+        if(err) return res.status(500).send('Произошла ошибка: ошибка базы данных.');
+        res.json({
+            name: a.name,
+            id: a._id,
+            description: a.description,
+            location: a.location,
+        });
+    });
+});
 
 // автоматическая визуализация представлений
 var autoViews = {};
