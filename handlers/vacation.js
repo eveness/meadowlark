@@ -8,7 +8,7 @@ function convertFromUSD(value, currency){
         case 'BTC': return (value * 0.0023707918444761) + ' Bitcoins';
         default: return NaN;
     }
-};
+}
 
 exports.list = function(req, res){
     Vacation.find({ available: true }, function(err, vacations){
