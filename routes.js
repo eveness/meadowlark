@@ -18,6 +18,7 @@ module.exports = function(app) {
 
 	// vacation routes
 	app.get('/vacations', vacation.list);
+	app.get('/vacation/:vacation', vacation.detail);
 	app.get('/notify-me-when-in-season', vacation.notifyWhenInSeason);
 	app.post('/notify-me-when-in-season', vacation.notifyWhenInSeasonProcessPost);
 	app.get('/set-currency/:currency', vacation.setCurrency);

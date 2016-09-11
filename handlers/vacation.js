@@ -18,6 +18,7 @@ exports.list = function(req, res){
             vacations: vacations.map(function(vacation){
                 return {
                     sku: vacation.sku,
+                    slug: vacation.slug,
                     name: vacation.name,
                     description: vacation.description,
                     inSeason: vacation.inSeason,
@@ -32,6 +33,14 @@ exports.list = function(req, res){
 	        case 'BTC': context.currencyBTC = 'selected'; break;
 	    }
         res.render('vacations', context);
+    });
+};
+
+exports.detail = function(req, res, next){
+    Vacation.findOne({ slug: req.params.vacation }, function(err, vacation){
+        if(err) return next(err);
+        if(!vacation) return next();
+        res.render('vacation', { vacation: vacation });
     });
 };
 

@@ -7,8 +7,8 @@ suite('Межстраничные тесты', function() {
     browser = new Browser();
   });
 
-  test('запрос расценок для групп со страницы туров по реке Худ должен заполнять поле реферрера', function(done) {
-    var referrer = 'http://localhost:3000/tours/hood-river';
+  test('запрос расценок для групп со страницы тура "Однодневный тур по реке Худ" должен заполнять поле реферрера', function(done) {
+    var referrer = 'http://localhost:3000/vacation/hood-river-day-trip';
     browser.visit(referrer, function(){
       browser.clickLink('.requestGroupRate', function(){
         assert(browser.field('referrer').value === referrer);
@@ -17,8 +17,8 @@ suite('Межстраничные тесты', function() {
     });
   });
 
-  test('запрос расценок для групп со страницы туров пансионата "Oregon Coast" должен заполнять поле реферрера', function(done) {
-    var referrer = 'http://localhost:3000/tours/oregon-coast';
+  test('запрос расценок для групп со страницы тура "Отдых в Орегон Коуст" должен заполнять поле реферрера', function(done) {
+    var referrer = 'http://localhost:3000/vacation/oregon-coast-getaway';
     browser.visit(referrer, function(){
       browser.clickLink('.requestGroupRate', function(){
         assert(browser.field('referrer').value === referrer);
@@ -28,7 +28,7 @@ suite('Межстраничные тесты', function() {
   });
 
   test('посещение страницы "Запрос цены для групп" напрямую должен приводить к пустому полю реферрера', function(done) {
-    browser.visit('http://localhost:3000/tours/request-group-rate', function(){
+    browser.visit('http://localhost:3000/request-group-rate', function(){
       assert(browser.field('referrer').value === '');
       done();
     });
