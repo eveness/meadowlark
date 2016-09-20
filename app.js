@@ -19,6 +19,9 @@ var handlebars = require('express-handlebars').create({
             if(!this._sections) this._sections = {};
             this._sections[name] = options.fn(this);
             return null;
+        },
+        static: function(name) {
+            return require('./lib/static.js').map(name);
         }
     }
 });
