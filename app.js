@@ -8,6 +8,7 @@ var opts = {
 	}
 };
 var vhost = require('vhost');
+var static = require('./lib/static.js').map;
 
 var app = express();
 app.set('port', process.env.PORT || 3000);
@@ -27,6 +28,14 @@ var handlebars = require('express-handlebars').create({
 });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
+
+app.use(function(req, res, next) {
+    var now = new Date();
+    res.locals.logoName = now.getMonth() == 11 && now.getDate() > 15 ?
+        static('/img/meadowlark_ny.jpg') :
+        static('/img/meadowlark.jpg');
+    next();
+});
 
 var admin = express.Router();
 app.use(vhost('admin.*', admin));
