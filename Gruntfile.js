@@ -4,6 +4,7 @@ module.exports = function(grunt){
 		'grunt-cafe-mocha',
 		'grunt-contrib-jshint',
 		'grunt-exec',
+		'grunt-lint-pattern',
 		'grunt-contrib-less',
 	].forEach(function(task){
 		grunt.loadNpmTasks(task);
@@ -19,6 +20,42 @@ module.exports = function(grunt){
 		},
 		exec: {
 			linkchecker: { cmd: 'c:/utils/linkchecker/linkchecker http://localhost:3000' }
+		},
+		lint_pattern: {
+			views_static: {
+				options: {
+					rules: [
+						{
+							pattern: /<link [^>]*href=["'](?!\{\{static )/,
+							message: 'В <link> обнаружен статический ресурс, которому не установлено соответствие.'
+						},
+						{
+							pattern: /<script [^>]*src=["'](?!\{\{static )/,
+							message: 'В <script> обнаружен статический ресурс, которому не установлено соответствие.'
+						},
+						{
+							pattern: /<img [^>]*src=["'](?!\{\{static )/,
+							message: 'В <img> обнаружен статический ресурс, которому не установлено соответствие.'
+						}
+					]
+				},
+				files: {
+					src: ['views/**/*.handlebars']
+				}
+			},
+			css_statics: {
+				options: {
+					rules: [
+						{
+							pattern: /url\(/,
+							message: 'В <link> обнаружен статический ресурс, которому не установлено соответствие.'
+						}
+					]
+				},
+				files: {
+					src: ['less/**/*.less']
+				}
+			}
 		},
 		less: {
 			development: {
@@ -36,5 +73,5 @@ module.exports = function(grunt){
 		}
 	});
 
-	grunt.registerTask('default', ['jshint','exec','cafemocha']);
+	grunt.registerTask('default', ['jshint','exec','cafemocha','lint_pattern']);
 };

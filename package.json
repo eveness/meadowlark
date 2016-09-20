@@ -28,6 +28,7 @@
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-less": "^1.4.0",
     "grunt-exec": "^1.0.0",
+    "grunt-lint-pattern": "^0.1.4",
     "mocha": "^3.0.2",
     "restler": "^3.4.0",
     "zombie": "^4.2.1"
