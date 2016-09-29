@@ -1,3 +1,5 @@
+var https = require('https');
+var fs = require('fs');
 var express = require('express');
 var weather = require('./lib/weather.js');
 var credentials = require('./credentials.js');
@@ -250,7 +252,6 @@ rest.get('/attraction/:id', function(req, content, cb) {
 
 // автоматическая визуализация представлений
 var autoViews = {};
-var fs = require('fs');
 
 app.use(function(req, res, next) {
 	var path = req.path.toLowerCase();
@@ -278,10 +279,18 @@ app.use(function(err, req, res, next) {
 });
 
 function startServer() {
-	app.listen(app.get('port'), function() {
-		console.log('Express запущен в режиме ' + app.get('env') +
-			' на http://localhost:' + app.get('port'));
-	});
+    var options = {
+        key: fs.readFileSync(__dirname + '/ssl/meadowlark.pem'),
+        cert: fs.readFileSync(__dirname + '/ssl/meadowlark.crt')
+    };
+    https.createServer(options, app).listen(app.get('port'), function() {
+        console.log('Express запущен в режиме ' + app.get('env') +
+            ' на https://localhost:' + app.get('port'));
+    });
+	// app.listen(app.get('port'), function() {
+	// 	console.log('Express запущен в режиме ' + app.get('env') +
+	// 		' на http://localhost:' + app.get('port'));
+	// });
 }
 
 if(require.main === module) {
