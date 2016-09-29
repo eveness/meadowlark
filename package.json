@@ -7,6 +7,7 @@
     "connect-rest": "^2.8.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.1",
+    "csurf": "^1.9.0",
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "express-logger": "0.0.3",

@@ -1,7 +1,7 @@
 <h2>Подпишитесь на нашу рассылку для получения новостей и специальных предложений!</h2>
 <div class="formContainer">
-	<form action="/process?form=newsletter" method="POST" class="newsLetterForm">
-		<input type="hidden" name="_csrf" value="{{csrf}}">
+	<form action="/newsletter" method="POST" class="newsLetterForm">
+		<input type="hidden" name="_csrf" value="{{_csrfToken}}">
 		<div>
 			<label for="fieldName">Имя</label>
 			<input type="text" name="name" id="fieldName">

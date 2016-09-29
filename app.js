@@ -150,6 +150,13 @@ app.use(require('express-session')({
 // middleware parse url encoded body
 app.use(require('body-parser').urlencoded({ extended: true }));
 
+// csrf token
+app.use(require('csurf')());
+app.use(function(req, res, next) {
+    res.locals._csrfToken = req.csrfToken();
+    next();
+});
+
 // middleware to add weather data to context
 app.use(function(req, res, next) {
 	if(!res.locals.partials) res.locals.partials = {};

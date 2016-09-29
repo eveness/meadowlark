@@ -9,6 +9,7 @@ module.exports = function(app) {
 	app.get('/', main.home);
 	app.get('/about', main.about);
 	app.get('/newsletter', main.newsletter);
+	app.post('/newsletter', main.newsletterProcessPost);
 	app.get('/thank-you', main.genericThankYou);
 
 	// contest routes
