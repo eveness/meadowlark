@@ -267,10 +267,43 @@ var auth = require('./lib/auth.js')(app, {
 auth.init();
 auth.registerRoutes();
 
-app.get('/account', function(req, res) {
-    if(!req.user) return res.redirect(303, '/unauthorized');
+function customerOnly(req, res, next){
+    if(req.user && req.user.role==='customer') return next();
+    // Мы хотим, чтобы при посещении страниц только
+    // покупатели знали, что требуется логин
+    res.redirect(303, '/unauthorized');
+}
+function employeeOnly(req, res, next){
+    if(req.user && req.user.role==='employee') return next();
+    // мы хотим, чтобы неуспех авторизации посещения
+    // страниц только для сотрудников был скрытым
+    // чтобы потенциальные хакеры не смогли даже
+    // узнать, что такая страница существует
+    next('route');
+}
+function allow(roles) {
+    return function(req, res, next) {
+        if(req.user && roles.split(',').indexOf(req.user.role)!==-1) return next();
+        res.redirect(303, '/unauthorized');
+    };
+}
+
+// маршруты покупателя
+app.get('/account', allow('customer, employee'), function(req, res){
     res.render('account', { username: req.user.name });
 });
+app.get('/account/order-history', customerOnly, function(req, res){
+    res.render('account/order-history');
+});
+app.get('/account/email-prefs', customerOnly, function(req, res){
+    res.render('account/email-prefs');
+});
+
+// маршруты сотрудника
+app.get('/sales', employeeOnly, function(req, res) {
+    res.render('sales');
+});
+
 app.get('/unauthorized', function(req, res) {
     res.status(403).render('unauthorized');
 });
