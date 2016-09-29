@@ -257,6 +257,24 @@ rest.get('/attraction/:id', function(req, content, cb) {
     });
 });
 
+// авторизация
+var auth = require('./lib/auth.js')(app, {
+    baseUrl: process.env.BASE_URL,
+    providers: credentials.authProviders,
+    successRedirect: '/account',
+    failureRedirect: '/unauthorized'
+});
+auth.init();
+auth.registerRoutes();
+
+app.get('/account', function(req, res) {
+    if(!req.user) return res.redirect(303, '/unauthorized');
+    res.render('account', { username: req.user.name });
+});
+app.get('/unauthorized', function(req, res) {
+    res.status(403).render('unauthorized');
+});
+
 // автоматическая визуализация представлений
 var autoViews = {};
 

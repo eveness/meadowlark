@@ -18,6 +18,8 @@
     "mongoose": "^4.6.0",
     "morgan": "^1.7.0",
     "nodemailer": "^2.5.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
     "session-mongoose": "^0.5.2",
     "vhost": "^3.0.2"
   },
